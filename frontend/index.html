@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychiatry Dissertation - Peptide Fatigue Analysis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Reddit Peptide Discourse Analysis</h1>
+        <p class="tagline">An analysis of user-reported fatigue in discussions related to peptides.</p>
+
+        <div class="controls">
+            <label for="category-select">Select a Fatigue Category:</label>
+            <select id="category-select">
+                <option value="cognitive">Cognitive Fatigue</option>
+                <option value="physical">Physical Fatigue</option>
+                <option value="emotional">Emotional Fatigue</option>
+                <option value="general">General Discussion (No Fatigue)</option>
+            </select>
+            <button id="fetch-button">Get Comments</button>
+        </div>
+        
+        <div class="loading-area hidden">
+            <div class="spinner"></div>
+            <p>Fetching relevant comments...</p>
+        </div>
+        
+        <div id="results-container">
+            <!-- Comments will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

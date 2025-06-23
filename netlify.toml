@@ -1,0 +1,14 @@
+# This file tells Netlify how to build and deploy your site.
+
+[build]
+  # The directory that contains your HTML, CSS, and JS files.
+  publish = "frontend"
+  
+  # The directory where your serverless functions live.
+  functions = "netlify/functions"
+
+# Redirects all other requests to the main page for single-page apps (optional but good practice)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

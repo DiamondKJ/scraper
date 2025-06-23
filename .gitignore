@@ -1,0 +1,12 @@
+# Ignore all CSV files
+*.csv
+
+# Ignore Python's cache directories
+__pycache__/
+
+# Ignore system files (like from macOS)
+.DS_Store
+
+# Ignore virtual environment folders (good practice)
+venv/
+env/ 
