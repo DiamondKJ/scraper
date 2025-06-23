@@ -4,34 +4,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const categorySelect = document.getElementById('category-select');
     const resultsContainer = document.getElementById('results-container');
     const loadingArea = document.querySelector('.loading-area');
+    const pigeon = document.getElementById('pigeon-cursor');
     const darkModeToggle = document.getElementById('dark-mode-checkbox');
     const body = document.body;
 
-        // ===== NEW & IMPROVED: Pigeon Cursor Logic =====
-    const pigeon = document.getElementById('pigeon-cursor');
-
+    // --- Pigeon Cursor Logic ---
     document.addEventListener('mousemove', (e) => {
-        // We request an animation frame to make the movement smoother and more efficient
         window.requestAnimationFrame(() => {
-            // Update the pigeon's position to follow the mouse's viewport coordinates
-            pigeon.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%,-50%)`;
+            pigeon.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
         });
     });
 
     // --- Dark Mode Logic ---
-    function enableDarkMode(isDark) {
+    function setDarkMode(isDark) {
         body.classList.toggle('dark-mode', isDark);
         localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
     }
-    
     darkModeToggle.addEventListener('change', () => {
-        enableDarkMode(darkModeToggle.checked);
+        setDarkMode(darkModeToggle.checked);
     });
-
-    // Check for saved dark mode preference on page load
+    // On page load, check for saved preference
     if (localStorage.getItem('darkMode') === 'enabled') {
         darkModeToggle.checked = true;
-        enableDarkMode(true);
+        setDarkMode(true);
     }
     
     // --- Chart Logic ---
@@ -39,17 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchAndRenderChart() {
         try {
             const response = await fetch(`/.netlify/functions/get-comments?mode=summary`);
+            if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
+            
             const labels = ['Cognitive', 'Physical', 'Emotional', 'General', 'Other Fatigue', 'Irrelevant'];
             const counts = [
                 data.cognitive, data.physical, data.emotional, data.general, data['fatigue-not-peptides'], data.irrelevant
             ];
 
             const ctx = document.getElementById('comments-chart').getContext('2d');
-            
-            if(commentsChart) {
-                commentsChart.destroy(); // Clear previous chart if it exists
-            }
+            if(commentsChart) commentsChart.destroy();
 
             commentsChart = new Chart(ctx, {
                 type: 'bar',
@@ -58,52 +52,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     datasets: [{
                         label: 'Number of High-Confidence Comments',
                         data: counts,
-                        backgroundColor: [
-                            'rgba(236, 64, 122, 0.6)',
-                            'rgba(77, 182, 172, 0.6)',
-                            'rgba(66, 165, 245, 0.6)',
-                            'rgba(156, 39, 176, 0.6)',
-                            'rgba(255, 167, 38, 0.6)',
-                            'rgba(158, 158, 158, 0.6)'
-                        ],
-                        borderColor: [
-                            'rgba(236, 64, 122, 1)',
-                            'rgba(77, 182, 172, 1)',
-                            'rgba(66, 165, 245, 1)',
-                            'rgba(156, 39, 176, 1)',
-                            'rgba(255, 167, 38, 1)',
-                            'rgba(158, 158, 158, 1)'
-                        ],
-                        borderWidth: 1
+                        backgroundColor: [ '#EC407A', '#4DB6AC', '#42A5F5', '#AB47BC', '#FFA726', '#9E9E9E' ],
+                        borderColor: [ '#d81b60', '#00796B', '#1E88E5', '#8E24AA', '#FB8C00', '#616161' ],
+                        borderWidth: 1,
+                        borderRadius: 5,
                     }]
                 },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1 // Ensure y-axis shows whole numbers
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                           display: false
-                        }
-                    }
-                }
+                options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
             });
 
-        } catch (error) {
-            console.error("Failed to load chart data:", error);
-        }
+        } catch (error) { console.error("Failed to load chart data:", error); }
     }
     
-    // --- Fetch Logic ---
-    fetchButton.addEventListener('click', () => {
-        const selectedCategory = categorySelect.value;
-        fetchComments(selectedCategory);
-    });
+    // --- Comments Fetch Logic ---
+    fetchButton.addEventListener('click', () => fetchComments(categorySelect.value));
 
     async function fetchComments(category) {
         resultsContainer.innerHTML = '';
@@ -113,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const comments = await response.json();
             displayComments(comments);
         } catch (error) {
-            resultsContainer.innerHTML = `<p class="error-message">Failed to fetch comments.</p>`;
+            resultsContainer.innerHTML = `<p class="info-message">Failed to fetch comments.</p>`;
         } finally {
             loadingArea.classList.add('hidden');
         }
@@ -129,8 +91,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'comment-card';
             const confidence = (comment.classification_confidence * 100).toFixed(1);
+            
+            // Create a paragraph element and set its text content to avoid HTML injection
+            const commentBody = document.createElement('p');
+            commentBody.className = 'comment-body';
+            commentBody.textContent = comment.comment_text_cleaned;
+            
             card.innerHTML = `
-                <p class="comment-body">${comment.comment_text_cleaned}</p>
+                ${commentBody.outerHTML}
                 <div class="comment-meta">
                     <span class="post-title">From post: "${comment.post_title}"</span>
                     <span class="meta-item">Confidence: ${confidence}%</span>
@@ -138,13 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             resultsContainer.appendChild(card);
             
-            // Trigger the animation with a slight delay for a cascade effect
-            setTimeout(() => {
-                card.classList.add('show');
-            }, 100 * index);
+            // Trigger the fade-in animation with a cascade effect
+            setTimeout(() => { card.classList.add('show'); }, 100 * index);
         });
     }
     
-    // --- Initial Load ---
-    fetchAndRenderChart(); // Load the chart as soon as the page loads
+    // --- Initial Page Load ---
+    fetchAndRenderChart();
 });
