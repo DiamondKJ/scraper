@@ -4,13 +4,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const categorySelect = document.getElementById('category-select');
     const resultsContainer = document.getElementById('results-container');
     const loadingArea = document.querySelector('.loading-area');
-    const pigeon = document.getElementById('pigeon-cursor');
     const darkModeToggle = document.getElementById('dark-mode-checkbox');
     const body = document.body;
 
-    // --- Pigeon Cursor Logic ---
+        // ===== NEW & IMPROVED: Pigeon Cursor Logic =====
+    const pigeon = document.getElementById('pigeon-cursor');
+
     document.addEventListener('mousemove', (e) => {
-        pigeon.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+        // We request an animation frame to make the movement smoother and more efficient
+        window.requestAnimationFrame(() => {
+            // Update the pigeon's position to follow the mouse's viewport coordinates
+            pigeon.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%,-50%)`;
+        });
     });
 
     // --- Dark Mode Logic ---
