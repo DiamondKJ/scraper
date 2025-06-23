@@ -10,14 +10,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- ===== UPDATED: The new Dancing Pigeon Cursor ===== -->
+    <img src="https://media.tenor.com/fOHw2gTDTl0AAAAi/akaruu-dance-pigeon.gif" alt="pigeon cursor" id="pigeon-cursor">
+
     <div class="container">
+        <!-- ===== NEW: Dark Mode Toggle ===== -->
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="dark-mode-checkbox">
+                <input type="checkbox" id="dark-mode-checkbox" />
+                <div class="slider round"></div>
+            </label>
+        </div>
+
         <h1>Reddit Peptide Discourse Analysis</h1>
         <p class="tagline">An analysis of user-reported fatigue in discussions related to peptides.</p>
 
+        <!-- ===== NEW: Chart Section ===== -->
+        <div class="chart-container">
+            <canvas id="comments-chart"></canvas>
+        </div>
+
         <div class="controls">
             <label for="category-select">Select a Fatigue Category:</label>
-            <!-- In frontend/index.html -->
-
             <select id="category-select">
                 <option value="cognitive">Cognitive Fatigue</option>
                 <option value="physical">Physical Fatigue</option>
@@ -29,8 +43,13 @@
             <button id="fetch-button">Get Comments</button>
         </div>
         
+        <!-- ===== NEW: Loading Animation Structure ===== -->
         <div class="loading-area hidden">
-            <div class="spinner"></div>
+            <div class="bouncing-dots">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
             <p>Fetching relevant comments...</p>
         </div>
         
@@ -38,8 +57,9 @@
             <!-- Comments will be dynamically inserted here -->
         </div>
     </div>
-
+    
+    <!-- ===== NEW: Chart.js Library ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-

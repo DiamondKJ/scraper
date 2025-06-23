@@ -1,48 +1,68 @@
-// netlify/functions/get-comments.js (Verified and Complete Version)
+// This function now has two modes:
+// 1. ?category=... : Fetches comments for one category.
+// 2. ?mode=summary : Counts all comments and returns a summary for the chart.
 
 const allComments = require('./comments.json');
 
-exports.handler = async (event) => {
-  const category = event.queryStringParameters.category;
-
-  if (!category) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'A "category" parameter is required.' }),
-    };
-  }
-  
-  // This map MUST exactly match the strings in your comments.json file
-  const classificationMap = {
+// --- This map MUST exactly match the strings in your comments.json file ---
+const classificationMap = {
     'cognitive': 'cognitive fatigue related to peptides',
-    'physical': 'physical fatigue related to peptides', // <-- This is the key one
+    'physical': 'physical fatigue related to peptides',
     'emotional': 'emotional fatigue related to peptides',
     'general': 'general peptide discussion, no fatigue mentioned',
-    
-    // It's a good idea to add mappings for the other categories your model found too
     'fatigue-not-peptides': 'fatigue mentioned, but not related to peptides',
     'irrelevant': 'irrelevant or other topic'
-  };
+};
 
-  const targetClassification = classificationMap[category.toLowerCase()];
+exports.handler = async (event) => {
+    const { category, mode } = event.queryStringParameters;
 
-  // If the category doesn't exist in our map, return an empty array
-  if (!targetClassification) {
+    // --- NEW: Handle request for summary data for the chart ---
+    if (mode === 'summary') {
+        const counts = {};
+        // Initialize counts for all categories in the map to 0
+        for (const key in classificationMap) {
+            counts[key] = 0;
+        }
+
+        // Count occurrences of each classification in the data
+        for (const comment of allComments) {
+            for (const key in classificationMap) {
+                if (comment.fatigue_classification === classificationMap[key]) {
+                    counts[key]++;
+                    break; // Move to the next comment once matched
+                }
+            }
+        }
+        
+        return {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(counts),
+        };
+    }
+
+    // --- Original logic for fetching comments by category ---
+    if (!category) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'A "category" or "mode" parameter is required.' }),
+        };
+    }
+
+    const targetClassification = classificationMap[category.toLowerCase()];
+
+    if (!targetClassification) {
+        return { statusCode: 200, body: JSON.stringify([]) };
+    }
+
+    const filteredComments = allComments.filter(comment => 
+        comment.fatigue_classification === targetClassification
+    );
+
     return {
         statusCode: 200,
-        body: JSON.stringify([]),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(filteredComments),
     };
-  }
-
-  const filteredComments = allComments.filter(comment => 
-    comment.fatigue_classification === targetClassification
-  );
-
-  return {
-    statusCode: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(filteredComments),
-  };
 };

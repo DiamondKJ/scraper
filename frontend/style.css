@@ -1,158 +1,157 @@
 /* Import Google Fonts */
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%); /* Soft Pink Gradient */
+    background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
     color: #444;
+    transition: background-color 0.4s ease, color 0.4s ease;
     margin: 0;
     padding: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
     min-height: 100vh;
+    cursor: none;
+}
+
+#pigeon-cursor {
+    position: fixed; /* Use fixed to avoid issues with scrolling */
+    width: 60px;
+    height: 60px;
+    pointer-events: none;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    transition: transform 0.1s ease-out;
 }
 
 .container {
     max-width: 900px;
     width: 100%;
     margin: 20px auto;
-    background-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.9);
     padding: 40px;
     border-radius: 18px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: background-color 0.4s ease, border-color 0.4s ease;
+    position: relative; /* Needed for positioning the theme switch */
 }
 
-h1 {
-    color: #d81b60; /* Deep Rose Pink */
-    text-align: center;
-    margin-bottom: 10px;
-    font-weight: 700;
+/* --- Dark Mode Theme --- */
+body.dark-mode {
+    background: #23272f;
+    color: #c9d1d9;
 }
-
-.tagline {
-    text-align: center;
-    color: #777;
-    margin-bottom: 40px;
-    font-size: 1.1em;
-    font-weight: 300;
+.dark-mode .container {
+    background-color: rgba(43, 48, 58, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
+.dark-mode h1 { color: #f06292; }
+.dark-mode .tagline { color: #8b949e; }
+.dark-mode .controls { background-color: #2d333b; }
+.dark-mode label { color: #c9d1d9; }
+.dark-mode select {
+    background-color: #3d4451;
+    color: #c9d1d9;
+    border-color: #555e6c;
+}
+.dark-mode .comment-card {
+    background-color: #2d333b;
+    border-color: #f06292;
+}
+.dark-mode .comment-body, .dark-mode .post-title { color: #c9d1d9; }
+.dark-mode .comment-meta { border-top-color: #444c56; }
+.dark-mode .meta-item { background-color: #584550; color: #ffcdd2;}
 
-.controls {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 40px;
+/* --- Dark Mode Toggle Switch --- */
+.theme-switch-wrapper {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+.theme-switch input { display: none; }
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px; width: 18px;
+    left: 4px; bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider { background-color: #d81b60; }
+input:checked + .slider:before { transform: translateX(24px); }
+
+/* --- Chart Styles --- */
+.chart-container {
+    margin: 40px auto;
     padding: 20px;
-    background-color: #fdf6f8;
+    background: rgba(255, 250, 250, 0.5);
     border-radius: 12px;
 }
-
-label {
-    font-weight: 600;
-    color: #555;
+.dark-mode .chart-container {
+    background: rgba(50, 56, 67, 0.5);
 }
 
-select, button {
-    font-family: 'Poppins', sans-serif;
-    padding: 12px 18px;
-    border-radius: 8px;
-    border: 1px solid #ffcdd2;
-    font-size: 1em;
-    cursor: pointer;
-}
+h1 { color: #d81b60; text-align: center; margin-bottom: 10px; }
+.tagline { text-align: center; color: #777; margin-bottom: 40px; font-size: 1.1em; }
+.controls { display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 40px; padding: 20px; background-color: #fdf6f8; border-radius: 12px; }
+select, button { font-family: 'Poppins', sans-serif; padding: 12px 18px; border-radius: 8px; border: 1px solid #ffcdd2; font-size: 1em; cursor: pointer; }
+button { background-color: #ec407a; color: white; font-weight: 600; border: none; transition: background-color 0.3s ease, transform 0.2s ease; }
+button:hover { background-color: #d81b60; transform: translateY(-2px); }
+.hidden { display: none !important; }
+#results-container { display: grid; gap: 25px; }
 
-select {
-    background-color: #fff;
-}
-
-button {
-    background-color: #ec407a; /* Vibrant Pink */
-    color: white;
-    font-weight: 600;
-    border: none;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-button:hover {
-    background-color: #d81b60; /* Darker pink on hover */
-    transform: translateY(-2px);
-}
-
-.loading-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 40px 0;
-    gap: 15px;
-    color: #777;
-    font-style: italic;
-}
-
-.spinner {
-    border: 5px solid rgba(216, 27, 96, 0.15); /* Light pink */
-    border-top: 5px solid #d81b60; /* Main pink */
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.hidden {
-    display: none !important;
-}
-
-#results-container {
-    display: grid;
-    gap: 25px;
-}
-
+/* --- Animated Comment Cards --- */
 .comment-card {
     background-color: #fff;
-    border-left: 6px solid #f48fb1; /* Medium pink accent */
+    border-left: 6px solid #f48fb1;
     border-radius: 10px;
     padding: 25px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease, background-color 0.4s ease, border-color 0.4s ease;
+    opacity: 0; /* Initially hidden */
+    transform: translateY(20px); /* Initially moved down */
 }
-
-.comment-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+.comment-card.show {
+    opacity: 1; /* Fade in */
+    transform: translateY(0); /* Slide up */
 }
+.comment-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); }
+.comment-card .comment-body { font-size: 1em; line-height: 1.6; margin-bottom: 20px; color: #333; }
+.comment-card .comment-meta { font-size: 0.85em; color: #888; border-top: 1px solid #f0f0f0; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.comment-card .meta-item { background-color: #fff3e0; color: #8D6E63; padding: 5px 10px; border-radius: 15px; font-weight: 600; }
+.comment-card .post-title { font-style: italic; color: #666; }
 
-.comment-card .comment-body {
-    font-size: 1em;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    color: #333;
+
+/* --- New Bouncing Dots Loader --- */
+.loading-area { display: flex; flex-direction: column; align-items: center; margin: 40px 0; gap: 15px; color: #777; font-style: italic; }
+.bouncing-dots { display: flex; justify-content: center; }
+.bouncing-dots > div {
+    width: 12px;
+    height: 12px;
+    margin: 3px 6px;
+    border-radius: 50%;
+    background-color: #d81b60;
+    animation: bouncing-dots 0.6s infinite alternate;
 }
-
-.comment-card .comment-meta {
-    font-size: 0.85em;
-    color: #888;
-    border-top: 1px dashed #f0f0f0;
-    padding-top: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.comment-card .meta-item {
-    background-color: #fff3e0;
-    color: #8D6E63;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-weight: 600;
-}
-
-.comment-card .post-title {
-    font-style: italic;
-    color: #666;
+.bouncing-dots > div:nth-child(2) { animation-delay: 0.2s; }
+.bouncing-dots > div:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bouncing-dots {
+    to {
+        opacity: 0.3;
+        transform: translateY(-10px);
+    }
 }
