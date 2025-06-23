@@ -1,3 +1,13 @@
+// --- Initial Page Load Screen ---
+window.addEventListener('load', () => {
+    const preloader = document.getElementById('preloader');
+    document.body.classList.add('loaded');
+    // Completely remove the preloader from the DOM after the fade-out animation
+    setTimeout(() => {
+        if(preloader) preloader.remove();
+    }, 1000); // Should match transition duration
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- Element Selectors ---
     const fetchButton = document.getElementById('fetch-button');
@@ -15,29 +25,25 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- Main Fetch Logic ---
     fetchButton.addEventListener('click', () => {
-        const selectedCategory = categorySelect.value;
-        fetchComments(selectedCategory);
+        fetchComments(categorySelect.value);
     });
 
     async function fetchComments(category) {
-        // Clear previous results and show spinner
         resultsContainer.innerHTML = '';
         loadingArea.classList.remove('hidden');
 
         try {
             const response = await fetch(`/.netlify/functions/get-comments?category=${category}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-            const comments = await response.json(); // The backend now sends the comments directly
+            // This now correctly expects a simple array, fixing the error
+            const comments = await response.json(); 
             displayComments(comments);
 
         } catch (error) {
             console.error('Error fetching comments:', error);
             resultsContainer.innerHTML = `<p class="info-message">Failed to fetch comments. Please check the console.</p>`;
         } finally {
-            // Hide spinner
             loadingArea.classList.add('hidden');
         }
     }
@@ -53,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'comment-card';
             const confidence = (comment.classification_confidence * 100).toFixed(1);
             
-            // Create a paragraph element and set its text content to avoid security risks
             const commentBody = document.createElement('p');
             commentBody.className = 'comment-body';
             commentBody.textContent = comment.comment_text_cleaned;
@@ -67,10 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             resultsContainer.appendChild(card);
             
-            // Trigger the fade-in animation with a cascade effect
-            setTimeout(() => {
-                card.classList.add('show');
-            }, 100 * index);
+            setTimeout(() => card.classList.add('show'), 100 * index);
         });
     }
 });

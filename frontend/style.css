@@ -1,82 +1,78 @@
-/* --- Global & Animated Background --- */
-body {
-    font-family: 'Poppins', sans-serif;
-    color: #444;
-    margin: 0;
-    padding: 30px;
-    min-height: 100vh;
-    cursor: none; /* Hide the default system cursor */
+// --- Initial Page Load Screen ---
+window.addEventListener('load', () => {
+    const preloader = document.getElementById('preloader');
+    document.body.classList.add('loaded');
+    // Completely remove the preloader from the DOM after the fade-out animation
+    setTimeout(() => {
+        if(preloader) preloader.remove();
+    }, 1000); // Should match transition duration
+});
 
-    /* The "Really Cool" Animated Gradient Background */
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Element Selectors ---
+    const fetchButton = document.getElementById('fetch-button');
+    const categorySelect = document.getElementById('category-select');
+    const resultsContainer = document.getElementById('results-container');
+    const loadingArea = document.querySelector('.loading-area');
+    const pigeon = document.getElementById('pigeon-cursor');
 
-/* Keyframes for the background animation */
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
+    // --- Pigeon Cursor Logic ---
+    document.addEventListener('mousemove', (e) => {
+        window.requestAnimationFrame(() => {
+            pigeon.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+        });
+    });
+    
+    // --- Main Fetch Logic ---
+    fetchButton.addEventListener('click', () => {
+        fetchComments(categorySelect.value);
+    });
 
-/* --- Pigeon Cursor --- */
-#pigeon-cursor {
-    position: fixed;
-    width: 60px;
-    height: 60px;
-    pointer-events: none;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    transform: translate(-50%, -50%);
-    transition: transform 0.1s ease-out;
-}
+    async function fetchComments(category) {
+        resultsContainer.innerHTML = '';
+        loadingArea.classList.remove('hidden');
 
-/* --- Main Layout --- */
-.container {
-    max-width: 900px;
-    width: 100%;
-    margin: 20px auto;
-    background-color: rgba(255, 255, 255, 0.85); /* Slightly transparent */
-    padding: 40px;
-    border-radius: 18px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px); /* Frosted glass effect */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
+        try {
+            const response = await fetch(`/.netlify/functions/get-comments?category=${category}`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-h1 { color: #2c3e50; text-align: center; margin-bottom: 10px; font-weight: 700; }
-.tagline { text-align: center; color: #555; margin-bottom: 40px; font-size: 1.1em; }
-.controls { display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 12px; }
-select, button { font-family: 'Poppins', sans-serif; padding: 12px 18px; border-radius: 8px; border: 1px solid #ddd; font-size: 1em; cursor: pointer; }
-button { background-color: #3498db; color: white; font-weight: 600; border: none; transition: background-color 0.3s ease, transform 0.2s ease; }
-button:hover { background-color: #2980b9; transform: translateY(-2px); }
+            // This now correctly expects a simple array, fixing the error
+            const comments = await response.json(); 
+            displayComments(comments);
 
-/* --- Loading Spinner & Results --- */
-.hidden { display: none !important; }
-.loading-area { display: flex; flex-direction: column; align-items: center; margin: 40px 0; gap: 15px; color: #777; font-style: italic; }
-.spinner {
-    border: 5px solid rgba(52, 152, 219, 0.2);
-    border-top: 5px solid #3498db;
-    border-radius: 50%;
-    width: 40px; height: 40px;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+            resultsContainer.innerHTML = `<p class="info-message">Failed to fetch comments. Please check the console.</p>`;
+        } finally {
+            loadingArea.classList.add('hidden');
+        }
+    }
 
-#results-container { display: grid; gap: 25px; }
+    function displayComments(comments) {
+        if (comments.length === 0) {
+            resultsContainer.innerHTML = `<p class="info-message">No high-confidence comments found for this category.</p>`;
+            return;
+        }
 
-.comment-card {
-    background-color: #fff;
-    border-left: 6px solid #3498db;
-    border-radius: 10px; padding: 25px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
-    transition: transform 0.4s ease, opacity 0.4s ease;
-    opacity: 0; transform: translateY(20px);
-}
-.comment-card.show { opacity: 1; transform: translateY(0); }
-.comment-card .comment-body { font-size: 1em; line-height: 1.6; margin-bottom: 20px; color: #333; }
-.comment-card .comment-meta { font-size: 0.85em; color: #888; border-top: 1px dashed #eee; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-.comment-card .meta-item { background-color: #eaf6ff; color: #3498db; padding: 5px 10px; border-radius: 15px; font-weight: 600; }
-.comment-card .post-title { font-style: italic; color: #666; }
+        comments.forEach((comment, index) => {
+            const card = document.createElement('div');
+            card.className = 'comment-card';
+            const confidence = (comment.classification_confidence * 100).toFixed(1);
+            
+            const commentBody = document.createElement('p');
+            commentBody.className = 'comment-body';
+            commentBody.textContent = comment.comment_text_cleaned;
+            
+            card.innerHTML = `
+                ${commentBody.outerHTML}
+                <div class="comment-meta">
+                    <span class="post-title">From post: "${comment.post_title}"</span>
+                    <span class="meta-item">Confidence: ${confidence}%</span>
+                </div>`;
+            
+            resultsContainer.appendChild(card);
+            
+            setTimeout(() => card.classList.add('show'), 100 * index);
+        });
+    }
+});
