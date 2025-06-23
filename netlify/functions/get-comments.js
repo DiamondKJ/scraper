@@ -1,10 +1,5 @@
-// This function now has two modes:
-// 1. ?category=... : Fetches comments for one category.
-// 2. ?mode=summary : Counts all comments and returns a summary for the chart.
-
 const allComments = require('./comments.json');
 
-// --- This map MUST exactly match the strings in your comments.json file ---
 const classificationMap = {
     'cognitive': 'cognitive fatigue related to peptides',
     'physical': 'physical fatigue related to peptides',
@@ -14,55 +9,76 @@ const classificationMap = {
     'irrelevant': 'irrelevant or other topic'
 };
 
+// --- Helper function to calculate word frequencies ---
+function getWordFrequencies(comments) {
+    const wordCounts = {};
+    const stopWords = new Set([
+        'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 
+        'he', 'him', 'his', 'she', 'her', 'it', 'its', 'they', 'them', 'their', 'theirs',
+        'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were',
+        'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'a', 'an', 'the', 'and', 'but', 'if', 'or',
+        'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'to', 'from',
+        'in', 'out', 'on', 'off', 'over', 'under', 'again', 'then', 'once', 'here', 'there', 'when',
+        'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such',
+        'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will',
+        'just', 'don', 'should', 'now'
+    ]);
+
+    comments.forEach(comment => {
+        // Simple word tokenization and cleaning
+        const words = comment.comment_text_cleaned.toLowerCase().match(/\b\w{3,}\b/g) || [];
+        words.forEach(word => {
+            if (!stopWords.has(word) && isNaN(word)) { // Exclude stop words and pure numbers
+                wordCounts[word] = (wordCounts[word] || 0) + 1;
+            }
+        });
+    });
+
+    // Convert to an array format the word cloud library can use
+    return Object.entries(wordCounts).map(([text, value]) => ({ text, value }));
+}
+
 exports.handler = async (event) => {
     const { category, mode } = event.queryStringParameters;
 
-    // --- NEW: Handle request for summary data for the chart ---
     if (mode === 'summary') {
+        // Same summary logic as before
         const counts = {};
-        // Initialize counts for all categories in the map to 0
-        for (const key in classificationMap) {
-            counts[key] = 0;
-        }
-
-        // Count occurrences of each classification in the data
+        for (const key in classificationMap) { counts[key] = 0; }
         for (const comment of allComments) {
             for (const key in classificationMap) {
                 if (comment.fatigue_classification === classificationMap[key]) {
                     counts[key]++;
-                    break; // Move to the next comment once matched
+                    break;
                 }
             }
         }
-        
-        return {
-            statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(counts),
-        };
+        return { statusCode: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(counts) };
     }
 
-    // --- Original logic for fetching comments by category ---
     if (!category) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: 'A "category" or "mode" parameter is required.' }),
-        };
+        return { statusCode: 400, body: JSON.stringify({ error: 'Category or mode is required.' }) };
     }
 
     const targetClassification = classificationMap[category.toLowerCase()];
-
-    if (!targetClassification) {
-        return { statusCode: 200, body: JSON.stringify([]) };
-    }
+    if (!targetClassification) return { statusCode: 200, body: JSON.stringify({ comments: [], words: [] }) };
 
     const filteredComments = allComments.filter(comment => 
         comment.fatigue_classification === targetClassification
     );
 
+    // --- NEW: Calculate word frequencies for the filtered comments ---
+    const wordFrequencies = getWordFrequencies(filteredComments);
+    
+    // --- NEW: Return both comments and words ---
+    const responsePayload = {
+        comments: filteredComments,
+        words: wordFrequencies
+    };
+
     return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(filteredComments),
+        body: JSON.stringify(responsePayload),
     };
 };
