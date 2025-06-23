@@ -5,73 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Psychiatry Dissertation - Peptide Fatigue Analysis</title>
     
-    <!-- This is the crucial link to your CSS file -->
+    <!-- Crucial link to your CSS file -->
     <link rel="stylesheet" href="style.css">
-
-    <!-- These are the links for the Google Font -->
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Thematic Background Video Player -->
-    <div class="video-background-container">
-        <video playsinline autoplay muted loop id="bg-video"></video>
-    </div>
-
-    <!-- The locally hosted Pigeon Cursor element -->
+    <!-- Locally hosted Pigeon Cursor element -->
     <img src="/pigeon.gif" alt="pigeon cursor" id="pigeon-cursor">
 
     <div class="container">
-        <!-- Dark Mode & Sound Controls -->
-        <div class="top-controls-wrapper">
-            <div class="sound-controls">
-                 <!-- NOTE: Sound is skipped for now, but leaving the button placeholder is fine -->
-            </div>
-            <div class="theme-switch-wrapper">
-                <label class="theme-switch" for="dark-mode-checkbox">
-                    <input type="checkbox" id="dark-mode-checkbox" />
-                    <div class="slider round"></div>
-                </label>
-            </div>
-        </div>
-        
         <h1>Reddit Peptide Discourse Analysis</h1>
         <p class="tagline">An analysis of user-reported fatigue in discussions related to peptides.</p>
 
-        <!-- Chart Section -->
-        <div class="chart-container">
-            <canvas id="comments-chart"></canvas>
+        <div class="controls">
+            <label for="category-select">Select a Fatigue Category:</label>
+            <select id="category-select">
+                <option value="cognitive">Cognitive Fatigue</option>
+                <option value="physical">Physical Fatigue</option>
+                <option value="emotional">Emotional Fatigue</option>
+                <option value="general">General Discussion (No Fatigue)</option>
+                <option value="fatigue-not-peptides">Fatigue (Not Peptide Related)</option>
+                <option value="irrelevant">Irrelevant / Other</option>
+            </select>
+            <button id="fetch-button">Get Comments</button>
         </div>
-
-        <!-- Word Cloud Container -->
-        <div id="wordcloud-container" class="hidden">
-            <h2>Common Terms</h2>
-            <div id="wordcloud"></div>
-        </div>
-
-        <!-- Loading Animation -->
+        
         <div class="loading-area hidden">
-            <div class="bouncing-dots">
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
+            <div class="spinner"></div>
             <p>Fetching relevant comments...</p>
         </div>
         
-        <!-- Results Container -->
         <div id="results-container">
             <!-- Comments will be dynamically inserted here -->
         </div>
     </div>
     
-    <!-- JAVASCRIPT LIBRARIES (Must come BEFORE our main script.js) -->
-    <script src="https://cdn.jsdelivr.net/npm/d3@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-cloud@1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- This is the crucial link to your main JavaScript file -->
+    <!-- Crucial link to your JavaScript file -->
     <script src="script.js"></script>
 </body>
 </html>

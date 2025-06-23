@@ -1,89 +1,82 @@
-/* Add these new styles to your existing CSS file. Replace old ones where names conflict. */
-
-/* --- Thematic Video Background --- */
-.video-background-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -2;
-    overflow: hidden;
-}
-#bg-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Cover the whole screen */
-    transition: opacity 1.5s ease-in-out;
-    opacity: 0.15; /* Default low opacity */
-}
-body.dark-mode #bg-video { opacity: 0.1; }
-
-/* Themes will just change the video's opacity */
-.theme-cognitive #bg-video,
-.theme-physical #bg-video,
-.theme-emotional #bg-video {
-    opacity: 0.25;
-}
-.dark-mode.theme-cognitive #bg-video,
-.dark-mode.theme-physical #bg-video,
-.dark-mode.theme-emotional #bg-video {
-    opacity: 0.15;
-}
-
-/* --- Sound Controls --- */
-.sound-controls { position: absolute; top: 20px; left: 20px; }
-#mute-button {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    padding: 0; display: flex; align-items: center; justify-content: center;
-    fill: #555;
-    transition: background-color 0.3s;
-}
-#mute-button:hover { background: rgba(255, 255, 255, 0.5); }
-#mute-button svg { width: 24px; height: 24px; }
-#icon-sound-off { display: none; }
-#mute-button.muted #icon-sound-on { display: none; }
-#mute-button.muted #icon-sound-off { display: block; }
-.dark-mode #mute-button { fill: #c9d1d9; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); }
-.dark-mode #mute-button:hover { background: rgba(0, 0, 0, 0.4); }
-
-/* --- Word Cloud --- */
-#wordcloud-container { text-align: center; margin-bottom: 30px; }
-#wordcloud-container h2 {
-    color: #ec407a;
-    border-bottom: 2px solid #ffcdd2;
-    display: inline-block;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-.dark-mode #wordcloud-container h2 { border-bottom-color: #f06292; }
-#wordcloud { width: 100%; height: 350px; }
-#wordcloud svg { width: 100%; height: 100%; }
-.word {
-    font-family: 'Poppins', sans-serif !important;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.3s ease, text-shadow 0.3s ease;
-}
-.word:hover { transform: scale(1.2); text-shadow: 0 0 10px rgba(0, 0, 0, 0.2); }
-
-
-/* --- Chart.js Clickable Cursor --- */
-#comments-chart { cursor: pointer; }
-
-/* Minor tweak to body */
+/* --- Global & Animated Background --- */
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #fff0f5; /* Simpler static background for base */
     color: #444;
-    transition: background-color 0.4s ease, color 0.4s ease;
     margin: 0;
     padding: 30px;
     min-height: 100vh;
-    cursor: none;
-    z-index: 1; /* Add this */
+    cursor: none; /* Hide the default system cursor */
+
+    /* The "Really Cool" Animated Gradient Background */
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
 }
+
+/* Keyframes for the background animation */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* --- Pigeon Cursor --- */
+#pigeon-cursor {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    pointer-events: none;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out;
+}
+
+/* --- Main Layout --- */
+.container {
+    max-width: 900px;
+    width: 100%;
+    margin: 20px auto;
+    background-color: rgba(255, 255, 255, 0.85); /* Slightly transparent */
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px); /* Frosted glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+h1 { color: #2c3e50; text-align: center; margin-bottom: 10px; font-weight: 700; }
+.tagline { text-align: center; color: #555; margin-bottom: 40px; font-size: 1.1em; }
+.controls { display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 12px; }
+select, button { font-family: 'Poppins', sans-serif; padding: 12px 18px; border-radius: 8px; border: 1px solid #ddd; font-size: 1em; cursor: pointer; }
+button { background-color: #3498db; color: white; font-weight: 600; border: none; transition: background-color 0.3s ease, transform 0.2s ease; }
+button:hover { background-color: #2980b9; transform: translateY(-2px); }
+
+/* --- Loading Spinner & Results --- */
+.hidden { display: none !important; }
+.loading-area { display: flex; flex-direction: column; align-items: center; margin: 40px 0; gap: 15px; color: #777; font-style: italic; }
+.spinner {
+    border: 5px solid rgba(52, 152, 219, 0.2);
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+#results-container { display: grid; gap: 25px; }
+
+.comment-card {
+    background-color: #fff;
+    border-left: 6px solid #3498db;
+    border-radius: 10px; padding: 25px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    opacity: 0; transform: translateY(20px);
+}
+.comment-card.show { opacity: 1; transform: translateY(0); }
+.comment-card .comment-body { font-size: 1em; line-height: 1.6; margin-bottom: 20px; color: #333; }
+.comment-card .comment-meta { font-size: 0.85em; color: #888; border-top: 1px dashed #eee; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.comment-card .meta-item { background-color: #eaf6ff; color: #3498db; padding: 5px 10px; border-radius: 15px; font-weight: 600; }
+.comment-card .post-title { font-style: italic; color: #666; }
