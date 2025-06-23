@@ -10,22 +10,13 @@ body {
     cursor: none;
 }
 
-/* ===== UPDATED: Styles for our pigeon cursor ===== */
 #pigeon-cursor {
-    position: fixed; /* <--- THE FIX! Use 'fixed' to keep it in the viewport */
-    width: 60px; /* Adjust size as needed */
-    height: 60px;
-    
-    /* Center the cursor GIF on the actual mouse pointer */
-    transform: translate(-50%, -50%); 
-    
-    /* IMPORTANT: This makes sure the pigeon doesn't block clicks */
+    position: fixed;
+    width: 300px;  /* Make it HUGE */
+    height: 300px; /* Make it HUGE */
+    background-color: red; /* Give it a solid color */
     pointer-events: none; 
-
-    /* Make sure it's on top of everything */
-    z-index: 9999; 
-    
-    /* Keep these for slightly smoother movement and positioning */
+    z-index: 9999999; /* Make the z-index insanely high */
     left: 0; 
     top: 0;
     transition: transform 0.1s ease-out;
