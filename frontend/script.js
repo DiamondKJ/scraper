@@ -1,11 +1,9 @@
 // --- Initial Page Load Screen ---
 window.addEventListener('load', () => {
-    const preloader = document.getElementById('preloader');
-    document.body.classList.add('loaded');
-    // Completely remove the preloader from the DOM after the fade-out animation
+    // We add a short delay just to ensure everything is rendered, then start the exit animation
     setTimeout(() => {
-        if(preloader) preloader.remove();
-    }, 1000); // Should match transition duration
+        document.body.classList.add('loaded');
+    }, 500); // 0.5 second delay after page fully loads
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,9 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // --- Main Fetch Logic ---
-    fetchButton.addEventListener('click', () => {
-        fetchComments(categorySelect.value);
-    });
+    if (fetchButton) {
+        fetchButton.addEventListener('click', () => {
+            fetchComments(categorySelect.value);
+        });
+    }
 
     async function fetchComments(category) {
         resultsContainer.innerHTML = '';
@@ -36,13 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`/.netlify/functions/get-comments?category=${category}`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-            // This now correctly expects a simple array, fixing the error
             const comments = await response.json(); 
             displayComments(comments);
 
         } catch (error) {
             console.error('Error fetching comments:', error);
-            resultsContainer.innerHTML = `<p class="info-message">Failed to fetch comments. Please check the console.</p>`;
+            resultsContainer.innerHTML = `<p class="info-message">Failed to fetch comments. Check the console.</p>`;
         } finally {
             loadingArea.classList.add('hidden');
         }

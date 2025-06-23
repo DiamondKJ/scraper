@@ -2,51 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- CRUCIAL FOR MOBILE -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Psychiatry Dissertation - Peptide Fatigue Analysis</title>
+    
+    <!-- This is the crucial link that was likely missing -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- ADDED 900 WEIGHT FOR THE BOLD TEXT -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- ===== THE "TYPE SHIT BROO" PRE-LOADER ===== -->
+    <!-- PRE-LOADER -->
     <div id="preloader">
         <h1>TYPE SHIT BROO</h1>
     </div>
 
-    <!-- The Pigeon that disappears on mobile -->
+    <!-- The Pigeon (only visible on desktop) -->
     <img src="/pigeon.gif" alt="pigeon cursor" id="pigeon-cursor">
 
-    <div class="container">
-        <h1>Reddit Peptide Discourse Analysis</h1>
-        <p class="tagline">An analysis of user-reported fatigue in discussions related to peptides.</p>
+    <!-- This div wraps the main content and is hidden until the page loads -->
+    <div id="page-content" class="hidden">
+        <div class="container">
+            <h1>Reddit Peptide Discourse Analysis</h1>
+            <p class="tagline">An analysis of user-reported fatigue in discussions related to peptides.</p>
 
-        <div class="controls">
-            <label for="category-select">Select a Fatigue Category:</label>
-            <select id="category-select">
-                <option value="cognitive">Cognitive Fatigue</option>
-                <option value="physical">Physical Fatigue</option>
-                <option value="emotional">Emotional Fatigue</option>
-                <option value="general">General Discussion (No Fatigue)</option>
-                <option value="fatigue-not-peptides">Fatigue (Not Peptide Related)</option>
-                <option value="irrelevant">Irrelevant / Other</option>
-            </select>
-            <button id="fetch-button">Get Comments</button>
-        </div>
-        
-        <div class="loading-area hidden">
-            <div class="spinner"></div>
-            <p>Fetching relevant comments...</p>
-        </div>
-        
-        <div id="results-container">
-            <!-- Comments will be dynamically inserted here -->
+            <div class="controls">
+                <label for="category-select">Select a Fatigue Category:</label>
+                <select id="category-select">
+                    <option value="cognitive">Cognitive Fatigue</option>
+                    <option value="physical">Physical Fatigue</option>
+                    <option value="emotional">Emotional Fatigue</option>
+                    <option value="general">General Discussion (No Fatigue)</option>
+                    <option value="fatigue-not-peptides">Fatigue (Not Peptide Related)</option>
+                    <option value="irrelevant">Irrelevant / Other</option>
+                </select>
+                <button id="fetch-button">Get Comments</button>
+            </div>
+            
+            <div class="loading-area hidden">
+                <div class="spinner"></div>
+                <p>Fetching relevant comments...</p>
+            </div>
+            
+            <div id="results-container">
+                <!-- Comments will be dynamically inserted here -->
+            </div>
         </div>
     </div>
     
+    <!-- Main JavaScript File -->
     <script src="script.js"></script>
 </body>
 </html>
